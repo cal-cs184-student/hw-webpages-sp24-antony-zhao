@@ -2,6 +2,103 @@
 	<head>
 	</head>
 	<body>
-		Homework 1 index.html here
+		Task 1:
+		<br>
+		We rasterize triangles by checking if points lie within the triangle defined by the three points. We do this by sampling points and see 
+		if their center (their coordinate + 0.5) lies within intersection of the lines that define the triangle. There is also a check to ensure that the direction is defined
+		correctly since the points may be in a different order. We check all the pixels that lie within the bounding box that defines the triangle, so it's the same as checking each sample within the
+		bounding box of the triangle.
+		<br>
+		<img src="task1.png">
+		<br>
+
+		Task 2: <br>
+		In order to account for supersampling, we multiply the sample_buffer by the sample_rate, and treat the grid as sqrt(sample_rate) * width by sqrt(sample_rate) * height
+		in the rasterize_triangle function. This also means we have to multiply all the point coordinates by sqrt(sample_rate) as well. We account for this later by in resolve_to_framebuffer
+		where we average the colors across squares of size sample_rate. <br>
+		One reason we use supersampling is to deal with jaggies, as it allows some pixels to take intermediate values, smoothing out the jaggies. This is done by the averaging step when 
+		resolving to the framebuffer, as it allows pixels to take intermediate values, smoothing out the parts between corners and making the pattern less jagged.
+		<br>
+		1x
+		<img src="task 2-0.png", alt="1x">
+		<br>
+		4x
+		<img src="task 2-1.png", alt="4x">
+		<br>
+		16x
+		<img src="task 2-3.png", alt="16x">
+		<br>
+		We can see that, as the supersampling increases, these corners blur more and more, and significantly reduce the amount of jaggedness to the corner (when zoomed out).
+		<br>
+
+		Task 3:
+		We attempted to mimic the famous "yamcha" pose of a person lying on the floor on their side (usually in a crater). We moved the arms/legs in order to mimic the pose.
+		<br>
+		<img src="task 3.png", alt="my_robot">
+		<br>
+
+		Task 4:
+		<br>
+		<img src="triangle.png">
+		<br>
+		Barycentric coordinates are a representation of the relative coordinate of a point in a triangle. This is done by representing the point using alpha beta and gamma,
+		 which sum to 1, and effectively represent how far a point is from each respective corner
+		of the triangle. We leverage it in this task in order to interpolate the color of the triangle,
+		 which you can see as the color smoothly transitions from red to green to blue along the edges/corners. We can also see that this interpolated color also continues
+		in the middle of the triangle. 
+		<br>
+		<img src="task 4.png">
+		<br>
+
+		Task 5:
+		Pixel sampling is the process of choosing pixels to do a low-resolution representation of an image. 
+		The goal is to make sure that this doesn't produce artifacts such as the moire pattern or jaggies.
+		To do texture mapping, we do sampling on the texture coordinate function (which we get from the mipmap) 
+		to get the pixel values in the resulting images. 
+		For this problem this comes from the level 0 mip. Using nearest sampling we simply choose the color of the texture closest to the u,v coordinate, 
+		whereas for bilinear interpolation,
+		we linearly interpolate between the nearest 4 points to get the color of the pixel.
+		<br>
+		1x nearest
+		<img src="task 5 (1).png">
+		<br>
+		<br>
+		1x bilinear
+		<img src="task 5 (2).png">
+		<br>
+		<br>
+		16x nearest
+		<img src="task 5 (3).png">
+		<br>
+		<br>
+		16x bilinear
+		<img src="task 5 (4).png">
+		<br>
+		It is a bit noticeable in the upper images, where using bilinear interpolation reduces jaggies on the letter B compared to nearest sampling, especially without supersampling.
+		This is likely more obvious when trying to sample on a sharper corner such as a triangle. <br> <br>
+
+		Task 6:
+		Level sampling involves determining the relative amount of detail some pixels may have, which allows us to use lower resolution texture functions. We use level sampling
+		to determine which level of mip to use for the texture at points in the image. This allows us to reduce the amount of computation and can speed up computation. <br>
+
+		We did texture sampling by computing how much the barycentric u, v coordinates change with respect to the x, y coordinates in the image, and using how far away the u, v 
+		points are from one another we can determine which level mip we need to represent the point. Depending on the option, we either chose level 0 (L_ZERO), 
+		the level closest to the level calculated (L_NEAREST), or we interoplate between the two closest levels. <br>
+		<br>
+		l_zero, p_nearest
+		<img src="task 6 (1).png">
+		<br>
+		<br>
+		l_zero, p_linear
+		<img src="task 6 (2).png">
+		<br>
+		<br>
+		l_nearest, p_nearest
+		<img src="task 6 (3).png">
+		<br>
+		<br>
+		l_nearest, p_linear
+		<img src="task 6 (4).png">
+		<br>
 	</body>
 </html>
