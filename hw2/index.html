@@ -1,7 +1,54 @@
 <html>
-	<head>
-	</head>
-	<body>
-		Homework 2 index.html here
-	</body>
+	<div>
+		<head>
+		</head>
+		<body>
+			<b>Question 1:</b><br>
+			The casteljau algorithm recursively linearly interpolates the points until we reach <br>
+			a single point which lies on the bezier curve. For example, on 4 points (abcd), we interpolate<br>
+			ab, bc, cd to get (efg), which we then interpolate as ef, fg to get (hi) which we interpolate into the final point.<br>
+			The algorithm uses a parameter t which gets passed into the interpolation function. <br>
+			By drawing all values of the point for t:[0, 1], we get all the points on the bezier curve. <br>
+			We implement this by filling in the evaluatestep, which performs one level of interpolation (i.e. abcd -> efg). <br>
+			We then call this function everytime the user presses a key.<br>
+			<figure>
+				<img src="q1 (1).png" width="500" height="300">
+				<img src="q1 (2).png" width="500" height="300">
+				<img src="q1 (3).png" width="500" height="300">
+				<img src="q1 (4).png" width="500" height="300">
+				<img src="q1 (5).png" width="500" height="300">
+				<img src="q1 (6).png" width="500" height="300">
+				<img src="q1 (7).png" width="500" height="300">
+				<figcaption>
+					Fig 1. The various stages of the algorithm, along with the final bezier curve overlayed on the steps<br>
+					and on the points.
+				</figcaption>
+			</figure>
+			<figure>
+				<img src="q1 (8).png" width="500" height="300">
+				<img src="q1 (9).png" width="500" height="300">
+				<img src="q1 (10).png" width="500" height="300">
+				<figcaption>
+					Fig 2. A slightly different set of points, along with the what happens when you vary <br>
+					parameter t (the red point moves along the curve).
+				</figcaption>
+			</figure>
+		</body>
+		<br>
+		<body>
+			<b>Question 2:</b><br>
+			First, for this problem we get a N x N grid of points, and have parameters of u and v both between [0, 1].<br>
+			In order to extrapolate the casteljau algorithm to the surfaces, we first call it along one set of axes, so N calls on N points, <br>
+			using parameter u as the interpolation parameter for this axis. This creates a set of points which lie on the bezier curves<br>
+			in the direction of that axis. We then call the algorithm on this set of points, using the parameter v as the interpolation parameter.<br>
+			This gives us a point which lies on the bezier surface for the N x N grid, and evaluating for all values (or enough values) of u, v gives us<br>
+			the bezier (or at least approximate) surface.<br>
+			<figure>
+				<img src="q2.png">
+				<figcaption>
+					Fig 3: The bezier surface of the teapot.
+				</figcaption>
+			</figure>
+		</body>
+	</div>
 </html>
