@@ -105,10 +105,16 @@
 			new positions. For debugging, one thing I did was disabling the new position assignment to check if the splitting was working correctly. This allowed me to identify a problem <br>
 			leftover from problem 4 which led to some weird denting patterns. Once I fixed this I re-enabled the position setting.
 			<figure>
-				<img src="q5.png">
+				<img src="q6 teapot (2).png" width="500" height="300">
+				<img src="q6 teapot (1).png" width="500" height="300">
+				<img src="q6 cube even (1).png" width="500" height="300">
+				<img src="q6 cube even (4).png" width="500" height="300">
+				<img src="q6 cube sharp (1).png" width="500" height="300">
+				<img src="q6 cube sharp (2).png" width="550" height="450">
 				<figcaption>
-					Fig 7: The result of arbitrarily flipping and/or splitting bunch of edges. Highlighted in red is the <br>
-					the process outlined in q6 of splitting all the edges of one triangle and flipping the right edge, just for verification that it's working correctly. 
+					Fig 7: As shown here, sharp corners/edges generally get smoother, which is fine sometimes but also really bad in other cases such as in the cube <br>
+					case, as we would prefer the sharp, defined corners to be kept there and not smoothened out. However, by splitting the edge we want to keep sharp before subdividing, <br>
+					it helps to reduce smoothing a little bit, as seen in the cube comparison.<br>
 				</figcaption>
 			</figure>
 			<figure>
@@ -118,8 +124,8 @@
 				<img src="q6 cube (4).png" width="500" height="300">
 				<img src="q6 cube (5).png" width="500" height="300">
 				<figcaption>
-					Fig 8: The way I found that helped make it much more symmetric in its subdivisions is simply by splitting all the cross edges in half, making it so <br>
-					every face of the cube was divided into an even 4 pieces initially.
+					Fig 8: As shown above, the default meshes leads to asymmetric subdivides. I believe this is due to the position assigning step, which would bias the <br>
+					new positions to shift perpendicularly away from the direction of the crossing edge.
 				</figcaption>
 			</figure>
 			<figure>
@@ -132,7 +138,8 @@
 				<img src="q6 cube even (7).png" width="500" height="300">
 				<figcaption>
 					Fig 9: The way I found that helped make it much more symmetric in its subdivisions is simply by splitting all the cross edges in half, making it so <br>
-					every face of the cube was divided into an even 4 pieces initially.
+					every face of the cube was divided into an even 4 pieces initially. This way the new position step doesn't bias the edges in any specific direction, and instead smoothens<br>
+					the cube out in every direction.
 				</figcaption>
 			</figure>
 		</body>
