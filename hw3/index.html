@@ -2,6 +2,216 @@
 	<head>
 	</head>
 	<body>
-		Homework 3 index.html here
+		https://cal-cs184-student.github.io/hw-webpages-sp24-antony-zhao/hw3/index.html<br><br>
+	    <b>Overview:</b><br>
+		In this homework we implemented many things such as ray generation, object intersection, indirect and direct lighting, as well as various sampling methods such as adaptive sampling.<br>
+		Overall it was very helpful to learn about these methods we had learned in lecture through the process of implementing, especially the ideas behind bouncing as well as sampling.<br>
+		Generally, for each problem I consulted the lecture slides in order to see the main ideas behind each part, as well as the pseudocode for reference if it existed. Then I took note of implementation details<br>
+		specified in the documentation and/or things I saw people mention on ED as having caused problems for them in the past, and used them to solve each part. <br>
+		<br>
+
+		<b>Task 1:</b><br>
+		Ray Generation: <br>
+		We generate rays by sampling a 1x1 grid and adding this samples coordinate to the x, y coordinate. This gives us a random coordinate inside the pixel we are generating for. <br>
+		We then convert this coordinate into the corresponding camera space, and call the generate_ray function, which produces a random ray in the camera space and converts/returns <br>
+		the same ray in the world space. <br>
+		<br>
+		Intersection: <br>
+		The primitive intersection checks every primitive object and sees if the generated ray intersects with any of them. If it does, then it returns then, for this part, <br>
+		we return the normal of the surface which is used to debug whether or not the methods are working correctly (which we could do by comparing them to the reference image).<br>
+		<br>
+		Triangle Intersection: <br>
+		We implemented the Moller Trumbore trianlge intersection algorithm. It uses the barycentric coordinates of the triangle to calculate if the ray intersects <br>
+		with the triangle. The algorithm does this by setting up a set of linear equations which we solve for to get the barycentric coordinates of the triangle where the intersection <br>
+		would occur as well as the t parameter where the intersection would occur. We can then check these coordinates and t parameter to see if they match the conditions for an intersection <br>
+		(i.e. valid barycentric coordinates and a t parameter within the min_t and max_t).<br>
+		<figure>
+			<img src="task 1/CBempty.png" width="400" height="300">
+			<img src="task 1/spheres.png" width="400" height="300">
+			<figcaption>
+				Fig 1. Various normal shading images. These are CBempty and CBspheres.
+			</figcaption>
+		</figure>
+		<br>
+
+
+		<b>Task 2:</b><br>
+		BVH Construction: <br>
+		Our method first iterates through the primitives and checks whether this node is a leaf node (by seeing if the number of primitives is low enough). <br>
+		If it is, we return this node with its start and end as the corresponding arguments.<br>
+		If not, we go through each xyz dimension and compare the centroid of the primitive in this dimension to the centroid of the bounding box of the aggregate of the primitives.<br>
+		We split them into a left and right node based on this. We then compare what the cost would be if we were to use this dimension as the split by using a <br>
+		surface area heuristic, to try to reduce the total surface area of the new bounding boxes, as well as trying to keep the number of elements in the left and right nodes approximately equal. <br>
+		To do this we compare the SA_left * num_left + SA_right * num_right of each dimension. <br>
+		Once we obtain the dimension, we sort the list based on centroid of this dimension. <br>
+		We then create a left and right node by recursively creating new left and right nodes on (start, start+left_num) and (start+left_num, end) correspondingly<br>
+		Lastly, we return the node we create which points to the left and right nodes.
+		<figure>
+			<img src="task 2/bunny.png" width="400" height="300">
+			<img src="task 2/bench.png" width="400" height="300">
+			<img src="task 2/maxplanck.png" width="400" height="300">
+			<img src="task 2/peter.png" width="400" height="300">
+			<figcaption>
+				Fig 2. Shading images for some medium and larger .dae files. These are CBbunny and bench, as well as maxplanck and peter.
+			</figcaption>
+		</figure>
+		Rendering times: <br>
+		As can be seen from the following images below, the rendering times without the optimized BVH construction take significantly longer, on the order<br>
+		of a few minutes compared to seconds. With the bunny taking 1.5 minutes without algorithm and 0.2 seconds with the algorithm, and the bench taking<br>
+		3 minutes with the algorithm and 0.1 seconds with it.
+		<figure>
+			<img src="task 2/bunny_fast.png">
+			<img src="task 2/bunny_slow.png">
+			<figcaption>
+				Fig 3. Comparing the rendering times for with and without the BVH construction algorithm for the CBbunny.
+			</figcaption>
+			<img src="task 2/bench_fast.png">
+			<img src="task 2/bench_slow.png">
+			<figcaption>
+				Fig 4. Comparing the rendering times for with and without the BVH construction algorithm for the bench.
+			</figcaption>
+		</figure>
+		<br>
+		<b>Task 3:</b><br>
+		Direct Lighting: <br>
+		These algorithms check to see what color an object is at an intersection in a scene by checking how much light arrives at the pixel and using this to calculate how much light is reflected back to the camera.
+		Uniform Hemisphere Sampling:<br>
+		For this algorithm, we generate n samples of rays which we simulate as having come off the hit point. <br>
+		We do this by generating directions from a hemisphere sampler, and create a new ray with the origin and hit_p and extending in the direction of the sample.<br>
+		We then check if this ray intersects with any objects in the scene, and get the amount of light that arrives at the object from this ray.<br>
+		We then add this value to an accumulating variable, and return the average result of the n-samples of rays.<br>
+		<br>
+		Importance Sampling Lights<br>
+		We loop over all the lights in the scene, and generate a number of sample rays from the light to the pixel we are evaluating for.<br>
+		The number of samples generated can vary based on if it's a point light, in which case we only need to generate one sample. <br>
+		For each light, we get the average amount of light which arrives at the pixel from these samples, and return the sum of all the amount of light which arrived at the point for each light.<br>
+		<br>
+		<figure>
+			<img src="task 3/bunny_1_1.png" width="400" height="300">
+			<img src="task 3/bunny_1_4.png" width="400" height="300">
+			<img src="task 3/bunny_1_16.png" width="400" height="300">
+			<img src="task 3/bunny_1_64.png" width="400" height="300">
+			<figcaption>
+				Fig 5. The 1, 4, 16, and 64 (in order) light rays and 1 sample per pixel images. As can be seen, the noise decreases as the number of light rays increases. The shadows also become closer to reality<br>
+				which we can see as it goes from solid dots throughout the shadow to the gradient of lighter gray to nearly black the closer it is to the object.
+			</figcaption>
+		</figure>
+		<figure>
+			<img src="task 3/spheres_H.png" width="800" height="600">
+			<img src="task 3/spheres.png" width="800" height="600">
+			<figcaption>
+				Fig 6. Hemisphere sampling vs Light sampling for spheres.
+			</figcaption>
+			<img src="task 3/CBbunny_H_64_32.png" width="800" height="600">
+			<img src="task 3/CBbunny_64_32.png" width="800" height="600">
+			<figcaption>
+				Fig 7. Hemisphere sampling vs Light sampling for bunny. <br>
+				When we compare the hemisphere sampling to light sampling, we can notice a lot more noise in hemisphere sampling (especially on the various walls where it stands out a lot more). <br>
+				The shadows both on and from the object are also a lot smoother in light sampling, compared to the noisy shadows from hemisphere sampling. This is even more noticeable the closer we are to the ceiling <br>
+				where upper corners are black in a lot of places where, when comparing to light sampling, should be an actual color and/or a darker shade of a color.
+			</figcaption>
+		</figure>
+		<br>
+
+		<b>Task 4:</b><br>
+		Indirect Lighting: <br>
+		The general idea is similar to how we do one bounce, where we check how much light arrived at a pixel use this to calculate how much light gets reflected. The difference is for this we need to account for multiple <br>
+		bounces of light, which we do by recurisvely calling this function. <br>
+		In more detail, for each call of the function we first calculate the amount of light for one bounce at the point and direction (or ray and intersection) by calling the one_bounce function. <br>
+		Then we sample a direction and bsdf from the surface. If a ray starting at the point of intersection, in the direction from the sample, intersects something in the scene, we call this function again, factored by the appropriate values. <br>
+		This provides us with the indirect light which contributes to the light that would be produced by current bounce. Intuitively, this recursive call would call one_bounce at the next depth, which would give us n+1 bounces of light. <br>
+		If either this the depth reaches the maximum depth we choose, or with termination probability we choose (0.4 in these results for roulette and 0 otherwise), then we return the amount of light that the bounce itself produces. <br>
+		Additionally, by choosing high maximum depth and enabling roulette, we minimize the amount of bias. <br>
+		<br>
+		<figure>
+			<img src="task 4/bunny_5_1024.png" width="400" height="300">
+			<img src="task 4/dragon_1024.png" width="400" height="300">
+			<img src="task 4/walle_1024.png" width="400" height="300">
+			<figcaption>
+				Fig 8. The bunny, dragon, and wall-e rendered with 1024 samples per pixel.
+			</figcaption>
+		</figure>
+		<figure>
+			<img src="task 4/bunny_direct.png" width="400" height="300">
+			<img src="task 4/bunny_indirect.png" width="400" height="300">
+			<figcaption>
+				Fig 9. A comparison of the direct lighting (0 and 1 bounce) to the indirect bounces (>=2 bounces), both sampled at 1024 pixels per sample.
+			</figcaption>
+		</figure>
+		<figure>
+			<img src="task 4/bunny_0_no_accum.png" width="400" height="300">
+			<img src="task 4/bunny_1_no_accum.png" width="400" height="300">
+			<img src="task 4/bunny_2_no_accum.png" width="400" height="300">
+			<img src="task 4/bunny_3_no_accum.png" width="400" height="300">
+			<img src="task 4/bunny_4_no_accum.png" width="400" height="300">
+			<img src="task 4/bunny_5_no_accum.png" width="400" height="300">
+			<figcaption>
+				Fig 10. Bunny without accumulating bounces (so only shows the nth bounce). (bounces of 0, 1, 2, 3, 4, 5)
+			</figcaption>
+		</figure>
+		<figure>
+			<img src="task 4/bunny_0_accum.png" width="400" height="300">
+			<img src="task 4/bunny_1_accum.png" width="400" height="300">
+			<img src="task 4/bunny_2_accum.png" width="400" height="300">
+			<img src="task 4/bunny_3_accum.png" width="400" height="300">
+			<img src="task 4/bunny_4_accum.png" width="400" height="300">
+			<img src="task 4/bunny_5_accum.png" width="400" height="300">
+			<figcaption>
+				Fig 11. Bunny with accumulating bounces (so shows the 0 through n bounces). (bounces of 0, 1, 2, 3, 4, 5)
+			</figcaption>
+		</figure>
+		<figure>
+			<img src="task 4/bunny_0_rr.png" width="400" height="300">
+			<img src="task 4/bunny_1_rr.png" width="400" height="300">
+			<img src="task 4/bunny_2_rr.png" width="400" height="300">
+			<img src="task 4/bunny_3_rr.png" width="400" height="300">
+			<img src="task 4/bunny_4_rr.png" width="400" height="300">
+			<img src="task 4/bunny_5_rr.png" width="400" height="300">
+			<img src="task 4/bunny_100_rr.png" width="400" height="300">
+			<figcaption>
+				Fig 12. Bunny with russian roulette bounces (so shows the 0-n bounces). (bounces of 0, 1, 2, 3, 4, 5, 100)
+			</figcaption>
+		</figure>
+		<figure>
+			<img src="task 4/bunny_5_1.png" width="400" height="300">
+			<img src="task 4/bunny_5_2.png" width="400" height="300">
+			<img src="task 4/bunny_5_4.png" width="400" height="300">
+			<img src="task 4/bunny_5_8.png" width="400" height="300">
+			<img src="task 4/bunny_5_16.png" width="400" height="300">
+			<img src="task 4/bunny_5_32.png" width="400" height="300">
+			<img src="task 4/bunny_5_64.png" width="400" height="300">
+			<img src="task 4/bunny_5_512.png" width="400" height="300">
+			<img src="task 4/bunny_5_1024.png" width="400" height="300">
+			<figcaption>
+				Fig 13. Bunny with varied samples per pixel (with 4 light rays). This was done with a maximum depth of 5. (samples of 1, 2, 4, 8, 16, 32, 64, 512, 1024).<br>
+				As expected, increasing the number of samples per pixel reduces noise (as each pixel gets closer to the expectation). It also unsurprisingly increases the amount of time needed to render as it has to loop over more and more rays. <br>
+				The differences between each image between 1-64 and between them and 512-1024 are pretty obvious, but it there aren't any obvious improvements between 512 and 1024, which is why the next part (adaptive sampling) is useful.
+			</figcaption>
+		</figure>
+		<br>
+
+		<b>Task 5:</b><br>
+		Adaptive Sampling: As we could see in figure 13, increasing the number of samples decreases noise up to a certain point.<br>
+		We can take this information and incorporate the fact that the number of samples needed for each pixel also varies, which leads to the motivation behind adaptive sampling. <br>
+		We do this by keeping track of the illuminance of the pixel over the samples, and calculating the mean and variance of it. <br>
+		Then, every samplesPerBatch (so we don't have to calculate it constantly), we check if the pixel value has converged depending on a maxTolerance parameter we choose. <br>
+		We do this by using the 95% confidence interval, or that we are 95% confident that the true illuminance(I) of the pixel lies between (mean - I) and (mean + I), which we define as having converged.<br><br>
+
+		Our implementation does this by keeping track of the sum of the illuminance (s1), the sum of the illuminance squared (s2), as well as the total number of samples. Every samplesPerBatch, we compute the variance and mean from these<br>
+		sums, where mean = s1 / n, and variance = (1/n-1) * (s2 - s1^2 / n). We then check if 1.96 * sqrt(variance / n) <= maxTolerance * mean, in which case we stop sampling and return the average of the samples we've taken so far.<br>
+		<figure>
+			<img src="task 5/bunny_2048_adaptive.png" width="400" height="300">
+			<img src="task 5/bunny_2048_adaptive_rate.png" width="400" height="300">
+			<figcaption>
+				Fig 14. The bunny along with the adaptive sampling over the each pixel. Red representing a high number of samples and blue representing a low number of samples. Both done with a maximum number of 2048.
+			</figcaption>
+		</figure> 
+		<figure>
+			<img src="task 5/dragon_2048_adaptive.png" width="400" height="300">
+			<img src="task 5/dragon_2048_adaptive_rate.png" width="400" height="300">
+		</figure> 
+		<figcaption>
+			Fig 15. The dragon along with the adaptive sampling over the each pixel. Red representing a high number of samples and blue representing a low number of samples. Both done with a maximum number of 2048.
+		</figcaption>
 	</body>
 </html>
