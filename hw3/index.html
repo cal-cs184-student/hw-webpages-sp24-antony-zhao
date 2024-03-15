@@ -24,7 +24,12 @@
 		We implemented the Moller Trumbore trianlge intersection algorithm. It uses the barycentric coordinates of the triangle to calculate if the ray intersects <br>
 		with the triangle. The algorithm does this by setting up a set of linear equations which we solve for to get the barycentric coordinates of the triangle where the intersection <br>
 		would occur as well as the t parameter where the intersection would occur. We can then check these coordinates and t parameter to see if they match the conditions for an intersection <br>
-		(i.e. valid barycentric coordinates and a t parameter within the min_t and max_t).<br>
+		(i.e. valid barycentric coordinates and a t parameter within the min_t and max_t). Then we appropriately set the values of the intersect object so we can use them later.<br>
+		<br>
+		Sphere Intersection: <br>
+		We implemented the ray sphere intersection specified in the slides. This solves for t where at^2 + bt + c = 0 where: a=d.d, b=2(o-c).d, c=(0-c).(0-c) - R^2. Using the quadratic formula,<br>
+		we obtain the t1 and t2 times. We then check if these are valid t's, and set t1 and t2 appropriately. This is done in test, and in intersect, we appropriately set the values of the intersect object<br>
+		so we can use them later.<br>
 		<figure>
 			<img src="task 1/CBempty.png" width="400" height="300">
 			<img src="task 1/spheres.png" width="400" height="300">
@@ -57,7 +62,7 @@
 		</figure>
 		Rendering times: <br>
 		As can be seen from the following images below, the rendering times without the optimized BVH construction take significantly longer, on the order<br>
-		of a few minutes compared to seconds. With the bunny taking 1.5 minutes without algorithm and 0.2 seconds with the algorithm, and the bench taking<br>
+		of a few minutes compared to seconds. With the bunny taking 1.5 minutes without the algorithm and 0.2 seconds with the algorithm, and the bench taking<br>
 		3 minutes with the algorithm and 0.1 seconds with it.
 		<figure>
 			<img src="task 2/bunny_fast.png">
