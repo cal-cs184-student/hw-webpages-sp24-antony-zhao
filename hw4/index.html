@@ -1030,8 +1030,10 @@ effects.
     </b></blockquote>
 
     <p>
-      The shader program is a program that calculates the color (and other information) being output given the appropriate inputs (such as camera position, surface normals, etc.), 
-      which runs in parallel to the rest of the code to significantly speed up the rendering process.
+      The shader program is a program that calculates a 4D vector output (which can include stuff such as color) given the appropriate inputs (such as camera position, surface normals, etc.), 
+      which runs in parallel, on the gpu, to the rest of the code to significantly speed up the rendering process.
+      Shaders usually consist of both a vertex and fragment shader, which produce their respective outputs for vertices, and fragments outputted by the rasterization process. These are then 
+       compiled/linked together, where the vertex shader's output is used as one of the fragment shader's inputs.
     </p>
 
 
@@ -1125,6 +1127,9 @@ entire Blinn-Phong model.
     </div>
 
     <p>
+      The bump mapping does a good job at producing a somewhat realistic bump on the sphere/cloth. However, if we want more exaggerated crevices/bumps, the displacement method does much better as it actually 
+      looks like there are crevices on the sphere (at least in the less coarse sphere). This is also unsurprising given the displacement method actually moves the position rather in addition to the other calculations done in the bump method.
+      <br>
       The higher resolution sphere leads to a more overall spherical shape, with bumps inserted at the expected locations. Whereas for the coarser sphere, the sphere itself doesn't look nearly as spherical,
       as well as the bumps/crevices looking a lot more shallow. This is likely due to not having enough detail to accurately represent where the bumps themselves should be, leading to an effect that's kind of similar 
       to jaggies on a low resolution triangle.
