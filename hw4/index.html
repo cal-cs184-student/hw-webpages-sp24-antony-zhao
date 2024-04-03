@@ -674,7 +674,7 @@ mjx-c.mjx-c37::before {
 
   <h1 align="center">CS 184: Computer Graphics and Imaging, Spring 2023</h1>
   <h1 align="center">Project 4: Cloth Simulator</h1>
-  <h2 align="center">Antony Zhao</h2>
+  <h2 align="center">Antony Zhao, github: https://cal-cs184-student.github.io/hw-webpages-sp24-antony-zhao/hw4/index.html</h2>
 
   <br><br>
 
@@ -689,7 +689,11 @@ on what interesting things you've learned from completing the project.</p>
   <h2 align="center">Part 1: Masses and springs</h2>
   </a>
   <p>
-    TODO
+    In this section, we modeled a piece of cloth as a grid of masses, with springs connecting them to model the behavior of the overall structure,
+     while also constraining the behavior to be realistic through the use of sets of structural, shearing, and bending springs.
+    <br>
+    We do this by initializing an array with all the point masses needed to model the cloth, and then going through all the pointmasses and connecting them with appropriate
+    pointmasses through springs.
   </p>
     <blockquote><b>
       Take some screenshots of <i>scene/pinned2.json</i> from a viewing angle where you can clearly see the cloth wireframe 
@@ -748,6 +752,12 @@ on what interesting things you've learned from completing the project.</p>
   <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-2">
   <h2 align="center">Part 2: Simulation via numerical integration</h2>
   </a>
+  <p>
+    In this section, we model the overall behavior of the system through calculating what the total amount of force on each point mass is, based on external forces and
+    the forces applied to it through its connecting springs.
+    <br>
+    Then, through Verlet integration, we calculate their next position. Then we go through every spring, constraining its connecting points such that they do not extend past 1.1 * rest_length.
+  </p>
     <blockquote><b>
       Experiment with some the parameters in the simulation. 
       To do so, pause the simulation at the start with <kbd>P</kbd>, modify the values of interest, and then resume by pressing <kbd>P</kbd> again. 
@@ -868,6 +878,17 @@ on what interesting things you've learned from completing the project.</p>
   <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-3">
   <h2 align="center">Part 3: Handling collisions with other objects</h2>
   </a>
+  <p>
+    In this section, we implement collision object between the point masses and spheres and planes. This allows us to model interesting behavior such as the cloth drooping over the sphere.
+    <br>
+    First, for the sphere, we check if the point mass's position is inside the sphere. If it is, we appropriately adjust its position based on its previous position and the current position, as well as a small correction
+     (which is also slightly adjusted by friction).
+    <br>
+    Then, for a plane, we check if the pointmass passes through the plane between its last position and current position, and if it does, we adjust its position in a similar way to the sphere, 
+    using the last and current position, as well as a small friction factor, to keep its current position on the same side of the plane as its last position.
+    <br>
+    Lastly, in the simulation we check every pointmass to see if it collided with an object, which would update its position to correct the intersection.
+  </p>
     <blockquote><b>
       Show us screenshots of your shaded cloth from <i>scene/sphere.json</i> in its final resting state 
       on the sphere using the default <code>ks = 5000</code> as well as with <code>ks = 500</code> and <code>ks = 50000</code>. 
@@ -919,7 +940,14 @@ on what interesting things you've learned from completing the project.</p>
   <a href="https://cs184.eecs.berkeley.edu/sp23/docs/proj4-part-4">
   <h2 align="center">Part 4: Handling self-collisions</h2>
   </a>
-
+  <p>
+    In this section, we implement an efficient self-collision algorithm to prevent the cloth from interesecting with itself. We do this by moving two points apart if they are too close to one another. 
+    <br>
+    To keep this efficient, we hash the space into multiple cubes, and mapping points which lie within the same cube to the same array. This way, we don't have to check every point against every other point. 
+    Then, for each hash, we loop over the points in it and check if they are too close, applying moving them apart if they are. We implemented the hashing function by floor dividing the pointmass's 
+    position by the dimensions of the cube, to find which cube it would lie in, and converting the 3d coordinate corresponding to the cube with 3 distinct primes (3 digit ones though larger would probably work better).
+    This way, each hash uniquely corresponds to each cube.
+  </p>
     <blockquote><b>
       Show us at least 3 screenshots that document how your cloth falls and folds on itself, 
       starting with an early, initial self-collision 
@@ -958,29 +986,34 @@ on what interesting things you've learned from completing the project.</p>
         <tbody><tr align="center">
           <td>
               <img src="index_update_files/t4-density-1.png" align="middle" width="400px">
-              <figcaption><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="4"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c64"></mjx-c><mjx-c class="mjx-c65"></mjx-c><mjx-c class="mjx-c6E"></mjx-c><mjx-c class="mjx-c73"></mjx-c><mjx-c class="mjx-c69"></mjx-c><mjx-c class="mjx-c74"></mjx-c><mjx-c class="mjx-c79"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c31"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>density</mtext><mo>=</mo><mn>1</mn></math></mjx-assistive-mml></mjx-container></figcaption>
+              <figcaption>density=1 g/cm^2<mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="4"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c64"></mjx-c><mjx-c class="mjx-c65"></mjx-c><mjx-c class="mjx-c6E"></mjx-c><mjx-c class="mjx-c73"></mjx-c><mjx-c class="mjx-c69"></mjx-c><mjx-c class="mjx-c74"></mjx-c><mjx-c class="mjx-c79"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c31"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>density</mtext><mo>=</mo><mn>1</mn></math></mjx-assistive-mml></mjx-container></figcaption>
               
           </td>
           <td>
               <img src="index_update_files/t4-density-2.png" align="middle" width="400px">
-              <figcaption><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="5"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c64"></mjx-c><mjx-c class="mjx-c65"></mjx-c><mjx-c class="mjx-c6E"></mjx-c><mjx-c class="mjx-c73"></mjx-c><mjx-c class="mjx-c69"></mjx-c><mjx-c class="mjx-c74"></mjx-c><mjx-c class="mjx-c79"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c35"></mjx-c><mjx-c class="mjx-c30"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>density</mtext><mo>=</mo><mn>100</mn></math></mjx-assistive-mml></mjx-container></figcaption>
+              <figcaption>density=100 g/cm^2<mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="5"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c64"></mjx-c><mjx-c class="mjx-c65"></mjx-c><mjx-c class="mjx-c6E"></mjx-c><mjx-c class="mjx-c73"></mjx-c><mjx-c class="mjx-c69"></mjx-c><mjx-c class="mjx-c74"></mjx-c><mjx-c class="mjx-c79"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c35"></mjx-c><mjx-c class="mjx-c30"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>density</mtext><mo>=</mo><mn>100</mn></math></mjx-assistive-mml></mjx-container></figcaption>
           </td>
         </tr>
         <tr align="center">
           <td>
               <img src="index_update_files/t4-ks-1.png" align="middle" width="400px">
-              <figcaption><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="6"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c6B"></mjx-c><mjx-c class="mjx-c73"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c31"></mjx-c></mjx-mn><mjx-mo class="mjx-n"><mjx-c class="mjx-c2C"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="2"><mjx-c class="mjx-c30"></mjx-c><mjx-c class="mjx-c30"></mjx-c><mjx-c class="mjx-c30"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>ks</mtext><mo>=</mo><mn>1</mn><mo>,</mo><mn>000</mn></math></mjx-assistive-mml></mjx-container></figcaption>
+              <figcaption>ks=10,000 N/m<mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="6"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c6B"></mjx-c><mjx-c class="mjx-c73"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c31"></mjx-c></mjx-mn><mjx-mo class="mjx-n"><mjx-c class="mjx-c2C"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="2"><mjx-c class="mjx-c30"></mjx-c><mjx-c class="mjx-c30"></mjx-c><mjx-c class="mjx-c30"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>ks</mtext><mo>=</mo><mn>10</mn><mo>,</mo><mn>000</mn></math></mjx-assistive-mml></mjx-container></figcaption>
           </td>
           <td>
               <img src="index_update_files/t4-ks-2.png" align="middle" width="400px">
-              <figcaption><mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="7"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c6B"></mjx-c><mjx-c class="mjx-c73"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c37"></mjx-c></mjx-mn><mjx-mo class="mjx-n"><mjx-c class="mjx-c2C"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="2"><mjx-c class="mjx-c35"></mjx-c><mjx-c class="mjx-c30"></mjx-c><mjx-c class="mjx-c30"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>ks</mtext><mo>=</mo><mn>7</mn><mo>,</mo><mn>500</mn></math></mjx-assistive-mml></mjx-container></figcaption>
+              <figcaption>ks=500 N/m<mjx-container class="MathJax CtxtMenu_Attached_0" jax="CHTML" style="font-size: 117.4%; position: relative;" tabindex="0" ctxtmenu_counter="7"><mjx-math class="MJX-TEX" aria-hidden="true"><mjx-mtext class="mjx-n"><mjx-c class="mjx-c6B"></mjx-c><mjx-c class="mjx-c73"></mjx-c></mjx-mtext><mjx-mo class="mjx-n" space="4"><mjx-c class="mjx-c3D"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="4"><mjx-c class="mjx-c37"></mjx-c></mjx-mn><mjx-mo class="mjx-n"><mjx-c class="mjx-c2C"></mjx-c></mjx-mo><mjx-mn class="mjx-n" space="2"><mjx-c class="mjx-c35"></mjx-c><mjx-c class="mjx-c30"></mjx-c><mjx-c class="mjx-c30"></mjx-c></mjx-mn></mjx-math><mjx-assistive-mml unselectable="on" display="inline"><math xmlns="http://www.w3.org/1998/Math/MathML"><mtext>ks</mtext><mo>=</mo><mn></mn><mo>,</mo><mn>500</mn></math></mjx-assistive-mml></mjx-container></figcaption>
           </td>
         </tr>
       </tbody></table>
     </div>
 
     <p>
-      TODO
+      With different densities, it produces different amount of folds. 
+      This is probably due to the amount of that the cloth resists moving side to side, as the force of gravity becomes stronger the more dense the cloth is, leading to
+      more parts of the cloth stacking on top of one another for higher densities, and spreading out on the plane for lower densities. <br>
+      <br>
+      By varying the ks, it also seems to affect the number of folds that take place, but by increasing it, the folds are also a lot smoother compared to the ones in the lower ks.
+      These differences are probably due to the lower ks giving more leeway for each point to move around, allowing it to potentially fold.
     </p>
 
 
@@ -996,7 +1029,8 @@ effects.
     </b></blockquote>
 
     <p>
-      TODO
+      The shader program is a program that calculates the color (and other information) being output given the appropriate inputs (such as camera position, surface normals, etc.), 
+      which runs in parallel to the rest of the code to significantly speed up the rendering process.
     </p>
 
 
@@ -1009,7 +1043,11 @@ entire Blinn-Phong model.
     </b></blockquote>
 
     <p>
-      TODO
+      Blinn-Phong shading gives the diffuse shading of an object, but also incorporates an ambient light component, as well as a specular reflection component. 
+      The ambient light is just ambient light in the environment, whereas the specular light deals with light when it is coming in a nearly mirror direction from the viewing perspective, 
+      as it would likely be underrepresented by the lambert cosine law used in diffuse lighting. 
+      It does this by using the half-angle vector based on the viewer direction and light direction, and the magnitude of the specular reflection depends on how close the normal and half-vectors are (using a dot-product).
+      This value is then raised to a power depending on how reflective a surface is. 
     </p>
 
     <div align="center">
@@ -1086,7 +1124,9 @@ entire Blinn-Phong model.
     </div>
 
     <p>
-      TODO
+      The higher resolution sphere leads to a more overall spherical shape, with bumps inserted at the expected locations. Whereas for the coarser sphere, the sphere itself doesn't look nearly as spherical,
+      as well as the bumps/crevices looking a lot more shallow. This is likely due to not having enough detail to accurately represent where the bumps themselves should be, leading to an effect that's kind of similar 
+      to jaggies on a low resolution triangle.
     </p>
 
 
@@ -1116,47 +1156,42 @@ entire Blinn-Phong model.
     </b></blockquote>
 
     <p>
-      TODO
+      I treated the rgb of the texture as a height map, by converting the rgb value to an hsv value, and then using the hue as the "height" of each point. 
+      Originally my idea was to use a weighted grayscale as the heightmap but I came across this idea in my search and preferred it as it was a bit more interesting. <br>
+      <br>
+      I also re-added the texture's colors to the shader, along with the Blinn-Phong shading, so it would give an interesting combination of: height mapping, textures, and lighting.
+      It also lead to a rather amusing result on the sphere, which distorts the height map of the bird in a really interesting way.
     </p>
+    <div align="center">
+      <table style="width:100%">
+        <tbody><tr align="center">
+          <td>
+            <img src="index_update_files/texture_4.png" align="middle" width="400vw">
+            <figcaption>Texture</figcaption>
+          </td>
+          <td>
+            <img src="index_update_files/cloth.png" align="middle" width="400vw">
+            <figcaption>Cloth (more exaggerated normals)</figcaption>
+          </td>
+        </td></tr>
+      </tbody></table>
+    </div>
 
-
-
-  <h2 align="center">Contributions</h2>
-  <p>
-    Partner A worked on TODO.
-  </p>
-  <br>
-  <p>
-    Partner B worked on TODO.
-  </p>
-
-
-
-  <h2 align="center">Mesh Competition Extra Credit (optional)</h2>
-  <blockquote><b>
-    The final (optional) part for the mesh competition is where you have the opportunity to be creative and individual, 
-    so be sure to provide a good description of what you were going for, what you did, and how you did it.
-  </b></blockquote>
-
-  <p>
-    N/A
-  </p>
-
-
-
-  <h2 align="center">Extra Credit (optional)</h2>
-    <blockquote><b>
-    If you implemented any additional technical features for the cloth simulation, 
-    clearly describe what you did and provide screenshots that illustrate your work. 
-    If it is an improvement compared to something already existing on the cloth simulation, 
-    compare and contrast them both in words and in images.
-    </b></blockquote>
-
-    <p>
-      N/A
-    </p>
-
-
+    <div align="center">
+      <table style="width:100%">
+        <tbody><tr align="center">
+          <td>
+            <img src="index_update_files/sphere.png" align="middle" width="400vw">
+            <figcaption>Sphere (more exaggerated normals)</figcaption>
+          </td>
+          <td>
+            <img src="index_update_files/cloth_on_sphere.png" align="middle" width="400vw">
+            <figcaption>Cloth on Sphere</figcaption>
+          </td>
+        </td></tr>
+      </tbody></table>
+    </div>
+    <tbody><tr align="center">
 
 </body><style>
 @media print {
